@@ -647,5 +647,31 @@ function buatNotaPDF(notaId, nikPembeli, namaPembeli, dataKeranjang) {
     return null;
   }
 }
+function exportSheetToJSON() {
+  // 1. Ambil data dari sheet aktif
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  
+  // 2. Format baris pertama sebagai nama kolom (keys)
+  var keys = data[0];
+  var jsonArray = [];
+  
+  for (var i = 1; i < data.length; i++) {
+    var obj = {};
+    for (var j = 0; j < keys.length; j++) {
+      obj[keys[j]] = data[i][j];
+    }
+    jsonArray.push(obj);
+  }
+  
+  // 3. Ubah objek menjadi string text JSON
+  var jsonString = JSON.stringify(jsonArray, null, 2);
+  
+  // 4. Simpan ke Google Drive
+  var fileName = sheet.getName() + "_data.json";
+  DriveApp.createFile(fileName, jsonString, MimeType.PLAIN_TEXT);
+  
+  Logger.log("Berhasil membuat file JSON dengan nama: " + fileName);
+}
 
 
