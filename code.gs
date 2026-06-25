@@ -41,7 +41,20 @@ function getActiveSpreadsheet() {
  * Handler untuk request GET (Web App)
  * @returns {GoogleAppsScript.HTML.HtmlOutput} Halaman HTML aplikasi
  */
-function doGet() {
+function doGet(e) {
+  // 🌟 JALUR 1: Jika GitHub meminta data katalog (misal lewat URL: .../exec?aksi=katalog)
+  if (e && e.parameter && e.parameter.aksi === 'katalog') {
+    try {
+      let dataKatalog = getDaftarBarang(); // Mengambil data barang Anda
+      return ContentService.createTextOutput(JSON.stringify(dataKatalog))
+        .setMimeType(ContentService.MimeType.JSON);
+    } catch(err) {
+      return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+  
+  // 🌟 JALUR 2: Jalur asli Anda tetap aman untuk membuka tampilan aplikasi
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
     .setTitle('Aplikasi Koperasi')
@@ -647,6 +660,7 @@ function buatNotaPDF(notaId, nikPembeli, namaPembeli, dataKeranjang) {
     return null;
   }
 }
+
 function exportSheetToJSON() {
   // 1. Ambil data dari sheet aktif
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -673,5 +687,4 @@ function exportSheetToJSON() {
   
   Logger.log("Berhasil membuat file JSON dengan nama: " + fileName);
 }
-
 
