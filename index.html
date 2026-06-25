@@ -145,11 +145,12 @@
   <nav class="navbar navbar-dark bg-success mb-3 shadow-sm">
     <div class="container d-flex justify-content-between align-items-center">
       <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
-        <img src="https://drive.google.com/thumbnail?sz=w100&id=10t-4qtU71Du0LPMbE2Eh22Vbi4Xw4QY3" 
-             alt="Logo" 
-             style="height: 32px; width: auto; margin-right: 8px; border-radius: 4px;"
-             onerror="this.src='https://via.placeholder.com/32?text=💼'">
-        <span>Koperasi GATRA MARANATHA</span>
+       <img src="https://drive.google.com/thumbnail?sz=w100&id=10t-4qtU71Du0LPMbE2Eh22Vbi4Xw4QY3" 
+     alt="Logo" 
+     referrerpolicy="no-referrer"
+     style="height: 32px; width: auto; margin-right: 8px; border-radius: 4px;"
+     onerror="this.onerror=null; this.src='https://via.placeholder.com/32?text=💼'">
+<span>Koperasi GATRA MARANATHA</span>
       </a>
       <span class="badge bg-light text-success fw-bold py-2">Online Shop</span>
     </div>
@@ -391,17 +392,41 @@
 
     // ==================== INIT ====================
     document.addEventListener("DOMContentLoaded", function() {
-      google.script.run
-        .withSuccessHandler(data => { 
-          semuaBarang = data; 
-          tampilkanKatalog(data); 
-        })
-        .withFailureHandler(err => { 
-          document.getElementById('katalog').innerHTML = `<div class="alert alert-danger">${err.message}</div>`; 
-        })
-        .getDaftarBarang();
+      // 1. PASTIKAN URL sudah diakhiri dengan ?aksi=katalog
+      const URL_API = "https://script.google.com/macros/s/AKfycbzamYeqQdEh8KAwF0OAOtu4YLimR661uNoZ-qsuBgLo-snRLMSmQ7rNTds5teBWcXJFww/exec?aksi=katalog";
+      
+      document.getElementById('katalog').innerHTML = '<div class="text-center p-4 text-muted">Sedang memuat katalog barang...</div>';
+      
+      // 2. Gunakan fetch dengan tambahan mode kustom agar bisa menembus redirect Google
+      fetch(URL_API, {
+        method: "GET",
+        headers: {
+          "Content-Type": "text/plain"
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Respons server tidak OK: " + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Jika Google mengirim pesan error dari dalam Apps Script
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        semuaBarang = data; 
+        tampilkanKatalog(data); 
+      })
+      .catch(err => { 
+        console.error("Gagal memuat katalog:", err);
+        document.getElementById('katalog').innerHTML = `
+          <div class="alert alert-danger m-3 small">
+            <strong>Gagal memuat katalog:</strong> ${err.message}<br>
+            <span class="text-muted">Pastikan saat Deploy ulang di Apps Script, pilihan 'Who has access' sudah diubah ke 'Anyone'.</span>
+          </div>`; 
+      });
     });
-
     // ==================== KATALOG FUNCTIONS ====================
     function tampilkanKatalog(barang) {
       let html = '';
