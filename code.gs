@@ -42,34 +42,33 @@ function getActiveSpreadsheet() {
  * @returns {GoogleAppsScript.HTML.HtmlOutput} Halaman HTML aplikasi
  */
 function doGet(e) {
-  // JALUR 1: Menerima ketukan pintu dari GitHub Pages
+  // 🌟 JALUR 1: Menerima permintaan data dari GitHub Pages (Fetch)
   if (e && e.parameter && e.parameter.aksi) {
     try {
       let aksi = e.parameter.aksi;
       let data;
       
       if (aksi === 'katalog') {
-        data = getDaftarBarang();
-      } else if (aksi === 'cekNik') {
-        // Memanggil fungsi cek NIK asli Anda (sesuaikan argumennya jika butuh parameter NIK)
-        data = cekNik(e.parameter.nik); 
-      } else if (aksi === 'verifikasiPin') {
-        data = verifikasiPin(e.parameter.pin);
-      } else if (aksi === 'getRetur') {
-        data = getDaftarRetur(); // sesuaikan dengan nama fungsi asli Anda
-      } else if (aksi === 'getLaporan') {
-        data = getLaporanPengurus(); // sesuaikan dengan nama fungsi asli Anda
+        data = getDaftarBarang(); 
+      } else if (aksi === 'validasiAnggota') {
+        // Memanggil fungsi validasiAnggota Anda menggunakan NIK dari HP
+        data = validasiAnggota(e.parameter.nik); 
+      } else if (aksi === 'prosesTransaksi') {
+        // Mengambil data keranjang yang dikirim dari HP
+        let payload = JSON.parse(e.parameter.payload);
+        data = prosesTransaksi(payload); 
       }
       
       return ContentService.createTextOutput(JSON.stringify(data))
         .setMimeType(ContentService.MimeType.JSON);
+        
     } catch(err) {
       return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
         .setMimeType(ContentService.MimeType.JSON);
     }
   }
   
-  // JALUR 2: Tampilan asli jika dibuka langsung di Google Apps Script
+  // 🌟 JALUR 2: Jalur asli untuk membuka tampilan aplikasi di Google Script
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
     .setTitle('Aplikasi Koperasi')
