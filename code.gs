@@ -701,3 +701,18 @@ function exportSheetToJSON() {
   Logger.log("Berhasil membuat file JSON dengan nama: " + fileName);
 }
 
+function doPost(e) {
+  try {
+    // Membaca kiriman data keranjang belanja dari GitHub
+    let payload = JSON.parse(e.postData.contents);
+    
+    // Langsung dioper ke fungsi prosesTransaksi asli milik Anda
+    let hasil = prosesTransaksi(payload);
+    
+    return ContentService.createTextOutput(JSON.stringify(hasil))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
