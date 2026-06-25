@@ -42,11 +42,26 @@ function getActiveSpreadsheet() {
  * @returns {GoogleAppsScript.HTML.HtmlOutput} Halaman HTML aplikasi
  */
 function doGet(e) {
-  // 🌟 JALUR 1: Jika GitHub meminta data katalog (misal lewat URL: .../exec?aksi=katalog)
-  if (e && e.parameter && e.parameter.aksi === 'katalog') {
+  // JALUR 1: Menerima ketukan pintu dari GitHub Pages
+  if (e && e.parameter && e.parameter.aksi) {
     try {
-      let dataKatalog = getDaftarBarang(); // Mengambil data barang Anda
-      return ContentService.createTextOutput(JSON.stringify(dataKatalog))
+      let aksi = e.parameter.aksi;
+      let data;
+      
+      if (aksi === 'katalog') {
+        data = getDaftarBarang();
+      } else if (aksi === 'cekNik') {
+        // Memanggil fungsi cek NIK asli Anda (sesuaikan argumennya jika butuh parameter NIK)
+        data = cekNik(e.parameter.nik); 
+      } else if (aksi === 'verifikasiPin') {
+        data = verifikasiPin(e.parameter.pin);
+      } else if (aksi === 'getRetur') {
+        data = getDaftarRetur(); // sesuaikan dengan nama fungsi asli Anda
+      } else if (aksi === 'getLaporan') {
+        data = getLaporanPengurus(); // sesuaikan dengan nama fungsi asli Anda
+      }
+      
+      return ContentService.createTextOutput(JSON.stringify(data))
         .setMimeType(ContentService.MimeType.JSON);
     } catch(err) {
       return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
@@ -54,13 +69,12 @@ function doGet(e) {
     }
   }
   
-  // 🌟 JALUR 2: Jalur asli Anda tetap aman untuk membuka tampilan aplikasi
+  // JALUR 2: Tampilan asli jika dibuka langsung di Google Apps Script
   return HtmlService.createTemplateFromFile('Index')
     .evaluate()
     .setTitle('Aplikasi Koperasi')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
-
 // ==================== ANGGOTA FUNCTIONS ====================
 
 /**
