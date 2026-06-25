@@ -379,6 +379,41 @@
 
   <!-- ==================== JAVASCRIPT ==================== -->
   <script>
+    
+    // 🚨 TARUH DI PALING ATAS DI DALAM TAG <SCRIPT>
+const URL_API = "https://script.google.com/macros/s/AKfybx...URL_WEB_APP_ANDA.../exec";
+
+// Membuat fungsi tiruan agar sistem google.script.run bisa bekerja di GitHub Pages
+if (typeof google === 'undefined' || !google.script) {
+  var google = {
+    script: {
+      run: {
+        successHandler: null,
+        failureHandler: null,
+        withSuccessHandler: function(callback) {
+          this.successHandler = callback;
+          return this;
+        },
+        withFailureHandler: function(callback) {
+          this.failureHandler = callback;
+          return this;
+        },
+        // Fungsi otomatis menebak nama fungsi yang dipanggil
+        getDaftarBarang: function() {
+          fetch(`${URL_API}?aksi=katalog`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+        },
+        cekNik: function(nik) {
+          fetch(`${URL_API}?aksi=cekNik&nik=${nik}`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+        },
+        verifikasiPin: function(pin) {
+          fetch(`${URL_API}?aksi=verifikasiPin&pin=${pin}`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+        }
+        // Anda bisa menambahkan daftar menu lainnya di bawah ini sesuai kebutuhan
+      }
+    }
+  };
+}
+    
     // ==================== VARIABLES GLOBAL ====================
     let semuaBarang = [];
     let keranjang = [];
