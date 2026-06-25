@@ -408,9 +408,18 @@ if (typeof google === 'undefined' || !google.script) {
             .then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
         },
         // 3. Fungsi Proses Transaksi Belanja
-        prosesTransaksi: function(payload) {
-          fetch(`${URL_API}?aksi=prosesTransaksi&payload=${encodeURIComponent(JSON.stringify(payload))}`)
-            .then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+       prosesTransaksi: function(payload) {
+          // Kita gunakan metode POST agar data belanjaan yang besar/banyak tidak terpotong di URL
+          fetch(`${URL_API}?aksi=prosesTransaksi`, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          })
+          .then(r => {
+            if (!r.ok) throw new Error("Gagal menyambung ke server Koperasi");
+            return r.json();
+          })
+          .then(this.successHandler)
+          .catch(this.failureHandler);
         }
       }
     }
