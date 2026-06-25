@@ -379,10 +379,9 @@
 
   <!-- ==================== JAVASCRIPT ==================== -->
   <script>
-    // 🚨 GANTI DENGAN URL WEB APP (/exec) TERBARU ANDA
-const URL_API = "https://script.google.com/macros/s/AKfycbyUVkHUH0QxtenGPQP6GWSK4Qu7khXSs-xTjoTd3jIB6MgNHomvb8uuW9OAlc0JzR6E2Q/exec";
+   // 🚨 PASTIKAN URL WEB APP (/exec) ANDA SUDAH BENAR
+const URL_API = "https://script.google.com/macros/s/AKfybx...MASUKKAN_URL_BARU_ANDA.../exec";
 
-// Jembatan Otomatis agar google.script.run bisa jalan di GitHub Pages
 if (typeof google === 'undefined' || !google.script) {
   var google = {
     script: {
@@ -397,29 +396,28 @@ if (typeof google === 'undefined' || !google.script) {
           this.failureHandler = callback;
           return this;
         },
-        // 1. Fungsi Ambil Katalog Barang
+        // 1. Ambil Katalog
         getDaftarBarang: function() {
-          fetch(`${URL_API}?aksi=katalog`)
-            .then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+          fetch(`${URL_API}?aksi=katalog`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
         },
-        // 2. Fungsi Validasi NIK Anggota
+        // 2. Cek NIK Anggota
         validasiAnggota: function(nik) {
-          fetch(`${URL_API}?aksi=validasiAnggota&nik=${encodeURIComponent(nik)}`)
-            .then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+          fetch(`${URL_API}?aksi=validasiAnggota&nik=${encodeURIComponent(nik)}`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
         },
-        // 3. Fungsi Proses Transaksi Belanja
-       prosesTransaksi: function(payload) {
-          // Kita gunakan metode POST agar data belanjaan yang besar/banyak tidak terpotong di URL
-          fetch(`${URL_API}?aksi=prosesTransaksi`, {
+        // 3. Simpan Transaksi / Nota (Metode POST karena membawa data keranjang besar)
+        simpanNotaKeSpreadsheet: function(payload) {
+          fetch(`${URL_API}?aksi=simpanNotaKeSpreadsheet`, {
             method: 'POST',
             body: JSON.stringify(payload)
-          })
-          .then(r => {
-            if (!r.ok) throw new Error("Gagal menyambung ke server Koperasi");
-            return r.json();
-          })
-          .then(this.successHandler)
-          .catch(this.failureHandler);
+          }).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+        },
+        // 4. Validasi PIN Pengurus (Retur & Laporan)
+        validasiPinPengurusSistemDirect: function(pin) {
+          fetch(`${URL_API}?aksi=validasiPin&pin=${encodeURIComponent(pin)}`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+        },
+        // 5. Buka Menu Pengurus
+        getDaftarPengurusLengkap: function() {
+          fetch(`${URL_API}?aksi=getPengurus`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
         }
       }
     }
@@ -440,40 +438,51 @@ if (typeof google === 'undefined' || !google.script) {
     // ==================== INIT ====================
     document.addEventListener("DOMContentLoaded", function() {
       // 1. PASTIKAN URL sudah diakhiri dengan ?aksi=katalog
-      const URL_API = "https://script.google.com/macros/s/AKfycbzamYeqQdEh8KAwF0OAOtu4YLimR661uNoZ-qsuBgLo-snRLMSmQ7rNTds5teBWcXJFww/exec?aksi=katalog";
-      
-      document.getElementById('katalog').innerHTML = '<div class="text-center p-4 text-muted">Sedang memuat katalog barang...</div>';
-      
-      // 2. Gunakan fetch dengan tambahan mode kustom agar bisa menembus redirect Google
-      fetch(URL_API, {
-        method: "GET",
-        headers: {
-          "Content-Type": "text/plain"
+      // 🚨 PASTIKAN URL WEB APP (/exec) ANDA SUDAH BENAR
+const URL_API = "https://script.google.com/macros/s/AKfybx...MASUKKAN_URL_BARU_ANDA.../exec";
+
+if (typeof google === 'undefined' || !google.script) {
+  var google = {
+    script: {
+      run: {
+        successHandler: null,
+        failureHandler: null,
+        withSuccessHandler: function(callback) {
+          this.successHandler = callback;
+          return this;
+        },
+        withFailureHandler: function(callback) {
+          this.failureHandler = callback;
+          return this;
+        },
+        // 1. Ambil Katalog
+        getDaftarBarang: function() {
+          fetch(`${URL_API}?aksi=katalog`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+        },
+        // 2. Cek NIK Anggota
+        validasiAnggota: function(nik) {
+          fetch(`${URL_API}?aksi=validasiAnggota&nik=${encodeURIComponent(nik)}`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+        },
+        // 3. Simpan Transaksi / Nota (Metode POST karena membawa data keranjang besar)
+        simpanNotaKeSpreadsheet: function(payload) {
+          fetch(`${URL_API}?aksi=simpanNotaKeSpreadsheet`, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          }).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+        },
+        // 4. Validasi PIN Pengurus (Retur & Laporan)
+        validasiPinPengurusSistemDirect: function(pin) {
+          fetch(`${URL_API}?aksi=validasiPin&pin=${encodeURIComponent(pin)}`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
+        },
+        // 5. Buka Menu Pengurus
+        getDaftarPengurusLengkap: function() {
+          fetch(`${URL_API}?aksi=getPengurus`).then(r => r.json()).then(this.successHandler).catch(this.failureHandler);
         }
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Respons server tidak OK: " + response.status);
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Jika Google mengirim pesan error dari dalam Apps Script
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        semuaBarang = data; 
-        tampilkanKatalog(data); 
-      })
-      .catch(err => { 
-        console.error("Gagal memuat katalog:", err);
-        document.getElementById('katalog').innerHTML = `
-          <div class="alert alert-danger m-3 small">
-            <strong>Gagal memuat katalog:</strong> ${err.message}<br>
-            <span class="text-muted">Pastikan saat Deploy ulang di Apps Script, pilihan 'Who has access' sudah diubah ke 'Anyone'.</span>
-          </div>`; 
-      });
-    });
+      }
+    }
+  };
+}
+
     // ==================== KATALOG FUNCTIONS ====================
     function tampilkanKatalog(barang) {
       let html = '';
