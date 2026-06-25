@@ -42,6 +42,7 @@ function getActiveSpreadsheet() {
  * @returns {GoogleAppsScript.HTML.HtmlOutput} Halaman HTML aplikasi
  */
 function doGet(e) {
+  // 🌟 JALUR 1: Menerima permintaan data dari GitHub Pages (Fetch)
   if (e && e.parameter && e.parameter.aksi) {
     try {
       let aksi = e.parameter.aksi;
@@ -50,21 +51,28 @@ function doGet(e) {
       if (aksi === 'katalog') {
         data = getDaftarBarang(); 
       } else if (aksi === 'validasiAnggota') {
+        // Memanggil fungsi validasiAnggota Anda menggunakan NIK dari HP
         data = validasiAnggota(e.parameter.nik); 
-      } else if (aksi === 'validasiPin') {
-        // Sesuaikan nama fungsi asli Anda untuk cek PIN (misal: validasiPinPengurusSistemDirect)
-        data = validasiPinPengurusSistemDirect(e.parameter.pin); 
-      } else if (aksi === 'getPengurus') {
-        // Sesuaikan nama fungsi asli Anda untuk ambil data pengurus
-        data = getDaftarPengurusLengkap(); 
+      } else if (aksi === 'prosesTransaksi') {
+        // Mengambil data keranjang yang dikirim dari HP
+        let payload = JSON.parse(e.parameter.payload);
+        data = prosesTransaksi(payload); 
       }
       
-      return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(JSON.stringify(data))
+        .setMimeType(ContentService.MimeType.JSON);
+        
     } catch(err) {
-      return ContentService.createTextOutput(JSON.stringify({ error: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
+        .setMimeType(ContentService.MimeType.JSON);
     }
   }
-  return HtmlService.createTemplateFromFile('Index').evaluate().setTitle('Aplikasi Koperasi').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  
+  // 🌟 JALUR 2: Jalur asli untuk membuka tampilan aplikasi di Google Script
+  return HtmlService.createTemplateFromFile('Index')
+    .evaluate()
+    .setTitle('Aplikasi Koperasi')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 // ==================== ANGGOTA FUNCTIONS ====================
 
@@ -695,13 +703,16 @@ function exportSheetToJSON() {
 
 function doPost(e) {
   try {
+    // Membaca kiriman data keranjang belanja dari GitHub
     let payload = JSON.parse(e.postData.contents);
     
-    // Memanggil fungsi asli simpan nota Anda
-    let hasil = simpanNotaKeSpreadsheet(payload);
+    // Langsung dioper ke fungsi prosesTransaksi asli milik Anda
+    let hasil = prosesTransaksi(payload);
     
-    return ContentService.createTextOutput(JSON.stringify(hasil)).setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify(hasil))
+      .setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({ error: err.toString() })).setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }
